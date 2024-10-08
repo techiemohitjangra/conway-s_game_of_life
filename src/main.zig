@@ -1,42 +1,53 @@
 const std = @import("std");
 const expect = std.testing.expect;
-const assert = std.debug.assert;
 const raylib = @import("raylib");
 const gameObj = @import("game.zig");
+var test_allocator = std.testing.allocator;
 
 pub fn main() !void {
-    const Game = gameObj.GameType(u100, 1000, 100, 10);
-    var game = Game{};
-    // std.debug.print("{any}", .{game});
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    var allocator = gpa.allocator();
 
-    raylib.initWindow(game.windowSize, game.windowSize, "Conway's Game of Life");
+    var game = try gameObj.Game.init(null, null, null, null, null, null, &allocator);
+    defer game.deinit();
+
+    raylib.initWindow(@as(i32, @intCast(game.windowWidth)), @as(i32, @intCast(game.windowHeight)), "Conway's Game of Life");
     defer raylib.closeWindow();
 
-    raylib.setTargetFPS(0);
+    raylib.setTargetFPS(game.fps);
 
     var isPaused: bool = false;
+
+    // loading font
+    const text = raylib.measureTextEx(
+        raylib.Font.init("/home/mohitjangra/.fonts/UbuntuNerdFont-Regular.ttf"),
+        "PAUSED",
+        128,
+        0,
+    );
+    const textStartX: i32 = @intFromFloat(text.x / 2);
+    const textStartY: i32 = @intFromFloat(text.y / 2);
 
     while (!raylib.windowShouldClose()) {
         const mousePosition = raylib.getMousePosition();
 
         if (raylib.isMouseButtonDown(raylib.MouseButton.mouse_button_left)) {
             if (@as(i32, @intFromFloat(mousePosition.x)) > 0 and
-                @as(i32, @intFromFloat(mousePosition.x)) < game.windowSize and
+                @as(i32, @intFromFloat(mousePosition.x)) < game.windowWidth and
                 @as(i32, @intFromFloat(mousePosition.y)) > 0 and
-                @as(i32, @intFromFloat(mousePosition.y)) < game.windowSize)
+                @as(i32, @intFromFloat(mousePosition.y)) < game.windowHeight)
             {
-                game.setCell(
-                    @as(u7, @intCast(@divTrunc(@as(u32, @intFromFloat(mousePosition.y)), @as(u32, @intCast(game.blockSize))))),
-                    @as(u7, @intCast(@divTrunc(@as(u32, @intFromFloat(mousePosition.x)), @as(u32, @intCast(game.blockSize))))),
-                );
+                const y = @as(u7, @intCast(@divTrunc(@as(u32, @intFromFloat(mousePosition.y)), @as(u32, @intCast(game.blockSize)))));
+                const x = @as(u7, @intCast(@divTrunc(@as(u32, @intFromFloat(mousePosition.x)), @as(u32, @intCast(game.blockSize)))));
+                game.resurrectCell(x, y);
             }
         }
 
         raylib.beginDrawing();
         defer raylib.endDrawing();
 
-        raylib.clearBackground(game.backgroundColor);
-        game.drawCells();
+        raylib.clearBackground(raylib.Color.gray);
+        game.drawAll();
         game.drawGrid();
 
         if (raylib.isKeyPressed(raylib.KeyboardKey.key_space)) {
@@ -49,21 +60,9 @@ pub fn main() !void {
         }
 
         if (isPaused) {
-            const textStartX: i32 = @intFromFloat(raylib.measureTextEx(
-                raylib.Font.init("/home/mohitjangra/.fonts/UbuntuNerdFont-Regular.ttf"),
-                "PAUSED",
-                128,
-                0,
-            ).x / 2);
-            const textStartY: i32 = @intFromFloat(raylib.measureTextEx(
-                raylib.Font.init("/home/mohitjangra/.fonts/UbuntuNerdFont-Regular.ttf"),
-                "PAUSED",
-                128,
-                0,
-            ).y / 2);
             raylib.drawText("PAUSED", textStartX, textStartY, 124, raylib.Color.red);
         } else {
-            game.updateGrid();
+            try game.updateAll();
         }
 
         const fps: i32 = raylib.getFPS();
@@ -71,200 +70,325 @@ pub fn main() !void {
     }
 }
 
-test "alive neighbours for top-left cell" {
-    const Game = gameObj.GameType(u3, 300, 3, null);
-    var game = Game{};
+test "alive neighbours top-left cell without diagonal" {
+    var game = try gameObj.Game.init(300, 300, 3, 3, 100, 1, &test_allocator);
+    defer game.deinit();
 
-    game.grid = [_]u3{ @as(u3, 2), @as(u3, 4), @as(u3, 0) };
-
-    try expect(game.getCellWithBitIndex(0, @intCast(game.gridSize - 0 - 1)) == false);
-    try expect(game.getCellWithBitIndex(0, @intCast(game.gridSize - 1 - 1)) == true);
-    try expect(game.getCellWithBitIndex(0, @intCast(game.gridSize - 2 - 1)) == false);
-    try expect(game.getCellWithBitIndex(1, @intCast(game.gridSize - 0 - 1)) == true);
-    try expect(game.getCellWithBitIndex(1, @intCast(game.gridSize - 1 - 1)) == false);
-    try expect(game.getCellWithBitIndex(1, @intCast(game.gridSize - 2 - 1)) == false);
-    try expect(game.getCellWithBitIndex(2, @intCast(game.gridSize - 0 - 1)) == false);
-    try expect(game.getCellWithBitIndex(2, @intCast(game.gridSize - 1 - 1)) == false);
-    try expect(game.getCellWithBitIndex(2, @intCast(game.gridSize - 2 - 1)) == false);
-
-    // try expect(game.getCell(0, 1) == true);
-    // try expect(game.getCell(0, 2) == false);
-    // try expect(game.getCell(1, 0) == true);
-    // try expect(game.getCell(1, 1) == false);
-    // try expect(game.getCell(1, 2) == false);
-    // try expect(game.getCell(2, 0) == false);
-    // try expect(game.getCell(2, 1) == false);
-    // try expect(game.getCell(2, 2) == false);
+    game.gameState.items[0].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[1].cellState = gameObj.CellState.Alive;
+    game.gameState.items[2].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[3].cellState = gameObj.CellState.Alive;
+    game.gameState.items[4].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[5].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[6].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[7].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[8].cellState = gameObj.CellState.LongDead;
 
     try expect(game.aliveNeighbours(0, 0) == 2);
 }
 
 test "alive neighbours top-left cell" {
-    const Game = gameObj.GameType(u3, 300, 3, null);
-    var game = Game{};
+    var game = try gameObj.Game.init(300, 300, 3, 3, 100, 1, &test_allocator);
+    defer game.deinit();
 
-    game.grid = [_]u3{ @as(u3, 2), @as(u3, 6), @as(u3, 0) };
+    game.gameState.items[0].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[1].cellState = gameObj.CellState.Alive;
+    game.gameState.items[2].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[3].cellState = gameObj.CellState.Alive;
+    game.gameState.items[4].cellState = gameObj.CellState.Alive;
+    game.gameState.items[5].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[6].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[7].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[8].cellState = gameObj.CellState.LongDead;
 
     try expect(game.aliveNeighbours(0, 0) == 3);
 }
 
 test "alive neighbours top cell" {
-    const Game = gameObj.GameType(u3, 300, 3, null);
-    var game = Game{};
+    var game = try gameObj.Game.init(300, 300, 3, 3, 100, 1, &test_allocator);
+    defer game.deinit();
 
-    game.grid = [_]u3{ @as(u3, 5), @as(u3, 7), @as(u3, 0) };
+    game.gameState.items[0].cellState = gameObj.CellState.Alive;
+    game.gameState.items[1].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[2].cellState = gameObj.CellState.Alive;
+    game.gameState.items[3].cellState = gameObj.CellState.Alive;
+    game.gameState.items[4].cellState = gameObj.CellState.Alive;
+    game.gameState.items[5].cellState = gameObj.CellState.Alive;
+    game.gameState.items[6].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[7].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[8].cellState = gameObj.CellState.LongDead;
 
     try expect(game.aliveNeighbours(0, 1) == 5);
 }
 
 test "alive neighbours for top-right cell" {
-    const Game = gameObj.GameType(u3, 300, 3, null);
-    var game = Game{};
+    var game = try gameObj.Game.init(300, 300, 3, 3, 100, 1, &test_allocator);
+    defer game.deinit();
 
-    game.grid = [_]u3{ @as(u3, 2), @as(u3, 3), @as(u3, 0) };
+    game.gameState.items[0].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[1].cellState = gameObj.CellState.Alive;
+    game.gameState.items[2].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[3].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[4].cellState = gameObj.CellState.Alive;
+    game.gameState.items[5].cellState = gameObj.CellState.Alive;
+    game.gameState.items[6].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[7].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[8].cellState = gameObj.CellState.LongDead;
+
     try expect(game.aliveNeighbours(0, 2) == 3);
 }
 
 test "alive neighbours for left cell" {
-    const Game = gameObj.GameType(u3, 300, 3, null);
-    var game = Game{};
+    var game = try gameObj.Game.init(300, 300, 3, 3, 100, 1, &test_allocator);
+    defer game.deinit();
 
-    game.grid = [_]u3{ @as(u3, 6), @as(u3, 2), @as(u3, 6) };
+    game.gameState.items[0].cellState = gameObj.CellState.Alive;
+    game.gameState.items[1].cellState = gameObj.CellState.Alive;
+    game.gameState.items[2].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[3].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[4].cellState = gameObj.CellState.Alive;
+    game.gameState.items[5].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[6].cellState = gameObj.CellState.Alive;
+    game.gameState.items[7].cellState = gameObj.CellState.Alive;
+    game.gameState.items[8].cellState = gameObj.CellState.LongDead;
+
     try expect(game.aliveNeighbours(1, 0) == 5);
 }
 
 test "alive neighbours center cell" {
-    const Game = gameObj.GameType(u3, 300, 3, null);
-    var game = Game{};
+    var game = try gameObj.Game.init(300, 300, 3, 3, 100, 1, &test_allocator);
+    defer game.deinit();
 
-    game.grid = [_]u3{ @as(u3, 7), @as(u3, 5), @as(u3, 7) };
+    game.gameState.items[0].cellState = gameObj.CellState.Alive;
+    game.gameState.items[1].cellState = gameObj.CellState.Alive;
+    game.gameState.items[2].cellState = gameObj.CellState.Alive;
+    game.gameState.items[3].cellState = gameObj.CellState.Alive;
+    game.gameState.items[4].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[5].cellState = gameObj.CellState.Alive;
+    game.gameState.items[6].cellState = gameObj.CellState.Alive;
+    game.gameState.items[7].cellState = gameObj.CellState.Alive;
+    game.gameState.items[8].cellState = gameObj.CellState.Alive;
 
     try expect(game.aliveNeighbours(1, 1) == 8);
 }
 
 test "alive neighbours right cell" {
-    const Game = gameObj.GameType(u3, 300, 3, null);
-    var game = Game{};
+    var game = try gameObj.Game.init(300, 300, 3, 3, 100, 1, &test_allocator);
+    defer game.deinit();
 
-    game.grid = [_]u3{ @as(u3, 3), @as(u3, 2), @as(u3, 3) };
+    game.gameState.items[0].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[1].cellState = gameObj.CellState.Alive;
+    game.gameState.items[2].cellState = gameObj.CellState.Alive;
+    game.gameState.items[3].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[4].cellState = gameObj.CellState.Alive;
+    game.gameState.items[5].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[6].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[7].cellState = gameObj.CellState.Alive;
+    game.gameState.items[8].cellState = gameObj.CellState.Alive;
 
     try expect(game.aliveNeighbours(1, 2) == 5);
 }
 
 test "alive neighbours bottom-left cell" {
-    const Game = gameObj.GameType(u3, 300, 3, null);
-    var game = Game{};
+    var game = try gameObj.Game.init(300, 300, 3, 3, 100, 1, &test_allocator);
+    defer game.deinit();
 
-    game.grid = [_]u3{ @as(u3, 0), @as(u3, 4), @as(u3, 2) };
+    game.gameState.items[0].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[1].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[2].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[3].cellState = gameObj.CellState.Alive;
+    game.gameState.items[4].cellState = gameObj.CellState.Alive;
+    game.gameState.items[5].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[6].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[7].cellState = gameObj.CellState.Alive;
+    game.gameState.items[8].cellState = gameObj.CellState.LongDead;
 
-    try expect(game.aliveNeighbours(2, 0) == 2);
+    try expect(game.aliveNeighbours(2, 0) == 3);
 }
 
 test "alive neighbours bottom cell" {
-    const Game = gameObj.GameType(u3, 300, 3, null);
-    var game = Game{};
+    var game = try gameObj.Game.init(300, 300, 3, 3, 100, 1, &test_allocator);
+    defer game.deinit();
 
-    game.grid = [_]u3{ @as(u3, 0), @as(u3, 7), @as(u3, 5) };
+    game.gameState.items[0].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[1].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[2].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[3].cellState = gameObj.CellState.Alive;
+    game.gameState.items[4].cellState = gameObj.CellState.Alive;
+    game.gameState.items[5].cellState = gameObj.CellState.Alive;
+    game.gameState.items[6].cellState = gameObj.CellState.Alive;
+    game.gameState.items[7].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[8].cellState = gameObj.CellState.Alive;
 
     try expect(game.aliveNeighbours(2, 1) == 5);
 }
 
 test "alive neighbours for bottom-right cell" {
-    const Game = gameObj.GameType(u3, 300, 3, null);
-    var game = Game{};
+    var game = try gameObj.Game.init(300, 300, 3, 3, 100, 1, &test_allocator);
+    defer game.deinit();
 
-    game.grid = [_]u3{ @as(u3, 0), @as(u3, 1), @as(u3, 2) };
-    try expect(game.aliveNeighbours(2, 2) == 2);
+    game.gameState.items[0].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[1].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[2].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[3].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[4].cellState = gameObj.CellState.Alive;
+    game.gameState.items[5].cellState = gameObj.CellState.Alive;
+    game.gameState.items[6].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[7].cellState = gameObj.CellState.Alive;
+    game.gameState.items[8].cellState = gameObj.CellState.LongDead;
+
+    try expect(game.aliveNeighbours(2, 2) == 3);
 }
 
-test "alive neighbours 0" {
-    const Game = gameObj.GameType(u3, 300, 3, null);
-    var game = Game{};
+test "alive neighbours 0 of center" {
+    var game = try gameObj.Game.init(300, 300, 3, 3, 100, 1, &test_allocator);
+    defer game.deinit();
 
-    game.grid = [_]u3{ @as(u3, 0), @as(u3, 0), @as(u3, 0) };
+    game.gameState.items[0].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[1].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[2].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[3].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[4].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[5].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[6].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[7].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[8].cellState = gameObj.CellState.LongDead;
+
     try expect(game.aliveNeighbours(1, 1) == 0);
 }
 
-test "alive neighbours 1" {
-    const Game = gameObj.GameType(u3, 300, 3, null);
-    var game = Game{};
+test "alive neighbours 1 of center" {
+    var game = try gameObj.Game.init(300, 300, 3, 3, 100, 1, &test_allocator);
+    defer game.deinit();
 
-    game.grid = [_]u3{ @as(u3, 4), @as(u3, 0), @as(u3, 0) };
+    game.gameState.items[0].cellState = gameObj.CellState.Alive;
+    game.gameState.items[1].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[2].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[3].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[4].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[5].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[6].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[7].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[8].cellState = gameObj.CellState.LongDead;
 
     try expect(game.aliveNeighbours(1, 1) == 1);
 }
 
-test "alive neighbours 2" {
-    const Game = gameObj.GameType(u3, 300, 3, null);
-    var game = Game{};
+test "alive neighbours 2 of center" {
+    var game = try gameObj.Game.init(300, 300, 3, 3, 100, 1, &test_allocator);
+    defer game.deinit();
 
-    game.grid = [_]u3{ @as(u3, 6), @as(u3, 0), @as(u3, 0) };
+    game.gameState.items[0].cellState = gameObj.CellState.Alive;
+    game.gameState.items[1].cellState = gameObj.CellState.Alive;
+    game.gameState.items[2].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[3].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[4].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[5].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[6].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[7].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[8].cellState = gameObj.CellState.LongDead;
 
     try expect(game.aliveNeighbours(1, 1) == 2);
 }
 
-test "alive neighbours 3" {
-    const Game = gameObj.GameType(u3, 300, 3, null);
-    var game = Game{};
+test "alive neighbours 3 of center" {
+    var game = try gameObj.Game.init(300, 300, 3, 3, 100, 1, &test_allocator);
+    defer game.deinit();
 
-    game.grid = [_]u3{ @as(u3, 7), @as(u3, 0), @as(u3, 0) };
+    game.gameState.items[0].cellState = gameObj.CellState.Alive;
+    game.gameState.items[1].cellState = gameObj.CellState.Alive;
+    game.gameState.items[2].cellState = gameObj.CellState.Alive;
+    game.gameState.items[3].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[4].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[5].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[6].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[7].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[8].cellState = gameObj.CellState.LongDead;
 
     try expect(game.aliveNeighbours(1, 1) == 3);
 }
 
-test "alive neighbours 4" {
-    const Game = gameObj.GameType(u3, 300, 3, null);
-    var game = Game{};
+test "alive neighbours 4 of center" {
+    var game = try gameObj.Game.init(300, 300, 3, 3, 100, 1, &test_allocator);
+    defer game.deinit();
 
-    game.grid = [_]u3{ @as(u3, 7), @as(u3, 4), @as(u3, 0) };
+    game.gameState.items[0].cellState = gameObj.CellState.Alive;
+    game.gameState.items[1].cellState = gameObj.CellState.Alive;
+    game.gameState.items[2].cellState = gameObj.CellState.Alive;
+    game.gameState.items[3].cellState = gameObj.CellState.Alive;
+    game.gameState.items[4].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[5].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[6].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[7].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[8].cellState = gameObj.CellState.LongDead;
 
     try expect(game.aliveNeighbours(1, 1) == 4);
 }
 
-test "alive neighbours 5" {
-    const Game = gameObj.GameType(u3, 300, 3, null);
-    var game = Game{};
+test "alive neighbours 5 of center" {
+    var game = try gameObj.Game.init(300, 300, 3, 3, 100, 1, &test_allocator);
+    defer game.deinit();
 
-    game.grid = [_]u3{ @as(u3, 7), @as(u3, 5), @as(u3, 0) };
+    game.gameState.items[0].cellState = gameObj.CellState.Alive;
+    game.gameState.items[1].cellState = gameObj.CellState.Alive;
+    game.gameState.items[2].cellState = gameObj.CellState.Alive;
+    game.gameState.items[3].cellState = gameObj.CellState.Alive;
+    game.gameState.items[4].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[5].cellState = gameObj.CellState.Alive;
+    game.gameState.items[6].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[7].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[8].cellState = gameObj.CellState.LongDead;
 
     try expect(game.aliveNeighbours(1, 1) == 5);
 }
 
-test "alive neighbours 6" {
-    const Game = gameObj.GameType(u3, 300, 3, null);
-    var game = Game{};
+test "alive neighbours 6 of center" {
+    var game = try gameObj.Game.init(300, 300, 3, 3, 100, 1, &test_allocator);
+    defer game.deinit();
 
-    game.grid = [_]u3{ @as(u3, 7), @as(u3, 5), @as(u3, 4) };
+    game.gameState.items[0].cellState = gameObj.CellState.Alive;
+    game.gameState.items[1].cellState = gameObj.CellState.Alive;
+    game.gameState.items[2].cellState = gameObj.CellState.Alive;
+    game.gameState.items[3].cellState = gameObj.CellState.Alive;
+    game.gameState.items[4].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[5].cellState = gameObj.CellState.Alive;
+    game.gameState.items[6].cellState = gameObj.CellState.Alive;
+    game.gameState.items[7].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[8].cellState = gameObj.CellState.LongDead;
 
     try expect(game.aliveNeighbours(1, 1) == 6);
 }
 
-test "alive neighbours 7" {
-    const Game = gameObj.GameType(u3, 300, 3, null);
-    var game = Game{};
+test "alive neighbours 7 of center" {
+    var game = try gameObj.Game.init(300, 300, 3, 3, 100, 1, &test_allocator);
+    defer game.deinit();
 
-    game.grid = [_]u3{ @as(u3, 7), @as(u3, 5), @as(u3, 6) };
+    game.gameState.items[0].cellState = gameObj.CellState.Alive;
+    game.gameState.items[1].cellState = gameObj.CellState.Alive;
+    game.gameState.items[2].cellState = gameObj.CellState.Alive;
+    game.gameState.items[3].cellState = gameObj.CellState.Alive;
+    game.gameState.items[4].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[5].cellState = gameObj.CellState.Alive;
+    game.gameState.items[6].cellState = gameObj.CellState.Alive;
+    game.gameState.items[7].cellState = gameObj.CellState.Alive;
+    game.gameState.items[8].cellState = gameObj.CellState.LongDead;
 
     try expect(game.aliveNeighbours(1, 1) == 7);
 }
 
-test "alive neighbours 7 with setCell and clearCell" {
-    const Game = gameObj.GameType(u3, 300, 3, null);
-    var game = Game{};
+test "alive neighbours 8 of center" {
+    var game = try gameObj.Game.init(300, 300, 3, 3, 100, 1, &test_allocator);
+    defer game.deinit();
 
-    game.grid = [_]u3{ @as(u3, 0), @as(u3, 0), @as(u3, 0) };
-    // game.grid = [_]u3{ @as(u3, 7), @as(u3, 5), @as(u3, 6) };
-    game.setCell(0, 0);
-    game.setCell(0, 1);
-    game.setCell(0, 2);
+    game.gameState.items[0].cellState = gameObj.CellState.Alive;
+    game.gameState.items[1].cellState = gameObj.CellState.Alive;
+    game.gameState.items[2].cellState = gameObj.CellState.Alive;
+    game.gameState.items[3].cellState = gameObj.CellState.Alive;
+    game.gameState.items[4].cellState = gameObj.CellState.LongDead;
+    game.gameState.items[5].cellState = gameObj.CellState.Alive;
+    game.gameState.items[6].cellState = gameObj.CellState.Alive;
+    game.gameState.items[7].cellState = gameObj.CellState.Alive;
+    game.gameState.items[8].cellState = gameObj.CellState.Alive;
 
-    game.setCell(1, 0);
-    game.clearCell(1, 1);
-    game.setCell(1, 2);
-
-    game.setCell(2, 0);
-    game.setCell(2, 1);
-    game.clearCell(2, 2);
-
-    try expect(game.aliveNeighbours(1, 1) == 7);
+    try expect(game.aliveNeighbours(1, 1) == 8);
 }
