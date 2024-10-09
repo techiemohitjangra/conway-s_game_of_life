@@ -23,10 +23,22 @@ pub const Cell = struct {
                 return raylib.Color.black;
             },
             CellState.OneGenDead => {
-                return raylib.Color.blue;
+                const powder_blue = raylib.Color{
+                    .r = 192,
+                    .g = 220,
+                    .b = 255,
+                    .a = 255,
+                };
+                return powder_blue;
             },
             CellState.TwoGenDead => {
-                return raylib.Color.sky_blue;
+                const light_blue_gray = raylib.Color{
+                    .r = 202,
+                    .g = 204,
+                    .b = 245,
+                    .a = 255,
+                };
+                return light_blue_gray;
             },
             CellState.LongDead => {
                 return raylib.Color.white;
@@ -108,11 +120,17 @@ pub const Game = struct {
     // pub fn drawUpdated(self: *Game) void {}
 
     pub fn drawGrid(self: *Game) void {
+        const light_gray_50 = raylib.Color{
+            .r = 200,
+            .g = 200,
+            .b = 200,
+            .a = 122,
+        };
         for (0..self.gridHeight) |y| {
-            raylib.drawLine(0, @as(i32, @intCast(y * self.blockSize)), @as(i32, @intCast(self.windowWidth)), @as(i32, @intCast(y * self.blockSize)), raylib.Color.light_gray);
+            raylib.drawLine(0, @as(i32, @intCast(y * self.blockSize)), @as(i32, @intCast(self.windowWidth)), @as(i32, @intCast(y * self.blockSize)), light_gray_50);
         }
         for (0..self.gridWidth) |x| {
-            raylib.drawLine(@as(i32, @intCast(x * self.blockSize)), 0, @as(i32, @intCast(x * self.blockSize)), @as(i32, @intCast(self.windowHeight)), raylib.Color.light_gray);
+            raylib.drawLine(@as(i32, @intCast(x * self.blockSize)), 0, @as(i32, @intCast(x * self.blockSize)), @as(i32, @intCast(self.windowHeight)), light_gray_50);
         }
     }
 
