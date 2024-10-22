@@ -1,46 +1,6 @@
 const std = @import("std");
 const raylib = @import("raylib");
-
-pub const CellState = enum {
-    Alive,
-    OneGenDead,
-    TwoGenDead,
-    LongDead,
-};
-
-pub const Cell = struct {
-    x: usize,
-    y: usize,
-    cellState: CellState = CellState.LongDead,
-    pub fn color(self: *const Cell) raylib.Color {
-        switch (self.cellState) {
-            CellState.Alive => {
-                return raylib.Color.black;
-            },
-            CellState.OneGenDead => {
-                const powder_blue = raylib.Color{
-                    .r = 192,
-                    .g = 220,
-                    .b = 255,
-                    .a = 255,
-                };
-                return powder_blue;
-            },
-            CellState.TwoGenDead => {
-                const light_blue_gray = raylib.Color{
-                    .r = 202,
-                    .g = 204,
-                    .b = 245,
-                    .a = 255,
-                };
-                return light_blue_gray;
-            },
-            CellState.LongDead => {
-                return raylib.Color.white;
-            },
-        }
-    }
-};
+const cell = @import("cell.zig");
 
 pub const GameConfig = struct {
     windowHeight: ?usize = 1000,
@@ -60,27 +20,27 @@ pub fn ConwayGame(config: GameConfig) type {
         gridWidth: usize = gridWidth,
         blockSize: usize = config.blockSize orelse 10,
         fps: i32 = config.fps orelse 10,
-        gameState: [size]Cell = undefined,
-        nextGen: [size]Cell = undefined,
+        gameState: [size]cell.Cell = undefined,
+        nextGen: [size]cell.Cell = undefined,
 
         pub fn init(
             self: *@This(),
         ) void {
             for (0..self.gameState.len) |index| {
-                self.gameState[index] = Cell{
+                self.gameState[index] = cell.Cell{
                     .y = @mod(index, self.gridWidth),
                     .x = @divFloor(index, self.gridWidth),
-                    .cellState = CellState.LongDead,
+                    .cellState = cell.CellState.LongDead,
                 };
-                self.nextGen[index] = Cell{
+                self.nextGen[index] = cell.Cell{
                     .y = @mod(index, self.gridWidth),
                     .x = @divFloor(index, self.gridWidth),
-                    .cellState = CellState.LongDead,
+                    .cellState = cell.CellState.LongDead,
                 };
             }
         }
 
-        pub fn getCellState(self: *@This(), y: usize, x: usize) CellState {
+        pub fn getCellState(self: *@This(), y: usize, x: usize) cell.CellState {
             return self.gameState[(y * self.gridWidth) + x].cellState;
         }
 
@@ -117,35 +77,35 @@ pub fn ConwayGame(config: GameConfig) type {
             var alive: i8 = 0;
 
             // checks cell on the left
-            if (x > 0 and self.getCellState(y, x - 1) == CellState.Alive) {
+            if (x > 0 and self.getCellState(y, x - 1) == cell.CellState.Alive) {
                 alive += 1;
             }
             // checks cell on the right
-            if (x < self.gridWidth - 1 and self.getCellState(y, x + 1) == CellState.Alive) {
+            if (x < self.gridWidth - 1 and self.getCellState(y, x + 1) == cell.CellState.Alive) {
                 alive += 1;
             }
             // checks cell on the top
-            if (y > 0 and self.getCellState(y - 1, x) == CellState.Alive) {
+            if (y > 0 and self.getCellState(y - 1, x) == cell.CellState.Alive) {
                 alive += 1;
             }
             // checks cell on the bottom
-            if (y < self.gridHeight - 1 and self.getCellState(y + 1, x) == CellState.Alive) {
+            if (y < self.gridHeight - 1 and self.getCellState(y + 1, x) == cell.CellState.Alive) {
                 alive += 1;
             }
             // checks cell on the top-left
-            if (y > 0 and x > 0 and self.getCellState(y - 1, x - 1) == CellState.Alive) {
+            if (y > 0 and x > 0 and self.getCellState(y - 1, x - 1) == cell.CellState.Alive) {
                 alive += 1;
             }
             // checks cell on the top-right
-            if (y > 0 and x < self.gridWidth - 1 and self.getCellState(y - 1, x + 1) == CellState.Alive) {
+            if (y > 0 and x < self.gridWidth - 1 and self.getCellState(y - 1, x + 1) == cell.CellState.Alive) {
                 alive += 1;
             }
             // checks cell on the bottom-left
-            if (y < self.gridHeight - 1 and x > 0 and self.getCellState(y + 1, x - 1) == CellState.Alive) {
+            if (y < self.gridHeight - 1 and x > 0 and self.getCellState(y + 1, x - 1) == cell.CellState.Alive) {
                 alive += 1;
             }
             // checks cell on the bottom-right
-            if (y < self.gridHeight - 1 and x < self.gridWidth - 1 and self.getCellState(y + 1, x + 1) == CellState.Alive) {
+            if (y < self.gridHeight - 1 and x < self.gridWidth - 1 and self.getCellState(y + 1, x + 1) == cell.CellState.Alive) {
                 alive += 1;
             }
 
@@ -155,13 +115,13 @@ pub fn ConwayGame(config: GameConfig) type {
         // sets the cell at coordinates (x,y) to recently Dead (i.e. OneGenDead)
         pub fn killCell(self: *@This(), y: usize, x: usize) void {
             const index = (y * self.gridWidth) + x;
-            self.gameState[index].cellState = CellState.OneGenDead;
+            self.gameState[index].cellState = cell.CellState.OneGenDead;
         }
 
         // sets the cell at coordinates (x,y) to alive
         pub fn resurrectCell(self: *@This(), y: usize, x: usize) void {
             const index = (y * self.gridWidth) + x;
-            self.gameState[index].cellState = CellState.Alive;
+            self.gameState[index].cellState = cell.CellState.Alive;
         }
 
         // updated the cell at coordinates (x, y) based on its neighboring cells
@@ -194,18 +154,18 @@ pub fn ConwayGame(config: GameConfig) type {
                     const alive = self.aliveNeighbours(y, x);
                     const index = (y * self.gridWidth) + x;
 
-                    if (self.gameState[index].cellState == CellState.Alive) {
+                    if (self.gameState[index].cellState == cell.CellState.Alive) {
                         // over and under population
                         if (alive < 2 or alive > 3) {
-                            nextGrid[index].cellState = CellState.OneGenDead;
+                            nextGrid[index].cellState = cell.CellState.OneGenDead;
                         }
                     } else {
                         if (alive == 3) {
-                            nextGrid[index].cellState = CellState.Alive;
-                        } else if (self.gameState[index].cellState == CellState.OneGenDead) {
-                            nextGrid[index].cellState = CellState.TwoGenDead;
-                        } else if (self.gameState[index].cellState == CellState.TwoGenDead) {
-                            nextGrid[index].cellState = CellState.LongDead;
+                            nextGrid[index].cellState = cell.CellState.Alive;
+                        } else if (self.gameState[index].cellState == cell.CellState.OneGenDead) {
+                            nextGrid[index].cellState = cell.CellState.TwoGenDead;
+                        } else if (self.gameState[index].cellState == cell.CellState.TwoGenDead) {
+                            nextGrid[index].cellState = cell.CellState.LongDead;
                         }
                     }
                 }
