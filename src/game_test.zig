@@ -1,8 +1,8 @@
 const std = @import("std");
-var test_allocator = std.testing.allocator;
 const expect = std.testing.expect;
 const gameLib = @import("game.zig");
 const cell = @import("cell.zig");
+var test_allocator = std.testing.allocator;
 
 const testConfig = gameLib.GameConfig{
     .windowHeight = 300,
@@ -12,7 +12,7 @@ const testConfig = gameLib.GameConfig{
 };
 
 test "alive neighbours top-left cell without diagonal" {
-    const Game = gameLib.ConwayGame(testConfig);
+    const Game = gameLib.ConwayGame(&testConfig);
     var game = Game{};
     game.init();
 
@@ -30,7 +30,7 @@ test "alive neighbours top-left cell without diagonal" {
 }
 
 test "alive neighbours top-left cell" {
-    const Game = gameLib.ConwayGame(testConfig);
+    const Game = gameLib.ConwayGame(&testConfig);
     var game = Game{};
     game.init();
 
@@ -48,7 +48,7 @@ test "alive neighbours top-left cell" {
 }
 
 test "alive neighbours top cell" {
-    const Game = gameLib.ConwayGame(testConfig);
+    const Game = gameLib.ConwayGame(&testConfig);
     var game = Game{};
     game.init();
 
@@ -66,7 +66,7 @@ test "alive neighbours top cell" {
 }
 
 test "alive neighbours for top-right cell" {
-    const Game = gameLib.ConwayGame(testConfig);
+    const Game = gameLib.ConwayGame(&testConfig);
     var game = Game{};
     game.init();
 
@@ -84,7 +84,7 @@ test "alive neighbours for top-right cell" {
 }
 
 test "alive neighbours for left cell" {
-    const Game = gameLib.ConwayGame(testConfig);
+    const Game = gameLib.ConwayGame(&testConfig);
     var game = Game{};
     game.init();
 
@@ -102,7 +102,7 @@ test "alive neighbours for left cell" {
 }
 
 test "alive neighbours center cell" {
-    const Game = gameLib.ConwayGame(testConfig);
+    const Game = gameLib.ConwayGame(&testConfig);
     var game = Game{};
     game.init();
 
@@ -120,7 +120,7 @@ test "alive neighbours center cell" {
 }
 
 test "alive neighbours right cell" {
-    const Game = gameLib.ConwayGame(testConfig);
+    const Game = gameLib.ConwayGame(&testConfig);
     var game = Game{};
     game.init();
 
@@ -138,7 +138,7 @@ test "alive neighbours right cell" {
 }
 
 test "alive neighbours bottom-left cell" {
-    const Game = gameLib.ConwayGame(testConfig);
+    const Game = gameLib.ConwayGame(&testConfig);
     var game = Game{};
     game.init();
 
@@ -156,7 +156,7 @@ test "alive neighbours bottom-left cell" {
 }
 
 test "alive neighbours bottom cell" {
-    const Game = gameLib.ConwayGame(testConfig);
+    const Game = gameLib.ConwayGame(&testConfig);
     var game = Game{};
     game.init();
 
@@ -174,7 +174,7 @@ test "alive neighbours bottom cell" {
 }
 
 test "alive neighbours for bottom-right cell" {
-    const Game = gameLib.ConwayGame(testConfig);
+    const Game = gameLib.ConwayGame(&testConfig);
     var game = Game{};
     game.init();
 
@@ -192,7 +192,7 @@ test "alive neighbours for bottom-right cell" {
 }
 
 test "alive neighbours 0 of center" {
-    const Game = gameLib.ConwayGame(testConfig);
+    const Game = gameLib.ConwayGame(&testConfig);
     var game = Game{};
     game.init();
 
@@ -210,7 +210,7 @@ test "alive neighbours 0 of center" {
 }
 
 test "alive neighbours 1 of center" {
-    const Game = gameLib.ConwayGame(testConfig);
+    const Game = gameLib.ConwayGame(&testConfig);
     var game = Game{};
     game.init();
 
@@ -228,7 +228,7 @@ test "alive neighbours 1 of center" {
 }
 
 test "alive neighbours 2 of center" {
-    const Game = gameLib.ConwayGame(testConfig);
+    const Game = gameLib.ConwayGame(&testConfig);
     var game = Game{};
     game.init();
 
@@ -246,7 +246,7 @@ test "alive neighbours 2 of center" {
 }
 
 test "alive neighbours 3 of center" {
-    const Game = gameLib.ConwayGame(testConfig);
+    const Game = gameLib.ConwayGame(&testConfig);
     var game = Game{};
     game.init();
 
@@ -264,7 +264,7 @@ test "alive neighbours 3 of center" {
 }
 
 test "alive neighbours 4 of center" {
-    const Game = gameLib.ConwayGame(testConfig);
+    const Game = gameLib.ConwayGame(&testConfig);
     var game = Game{};
     game.init();
 
@@ -282,7 +282,7 @@ test "alive neighbours 4 of center" {
 }
 
 test "alive neighbours 5 of center" {
-    const Game = gameLib.ConwayGame(testConfig);
+    const Game = gameLib.ConwayGame(&testConfig);
     var game = Game{};
     game.init();
 
@@ -300,7 +300,7 @@ test "alive neighbours 5 of center" {
 }
 
 test "alive neighbours 6 of center" {
-    const Game = gameLib.ConwayGame(testConfig);
+    const Game = gameLib.ConwayGame(&testConfig);
     var game = Game{};
     game.init();
 
@@ -318,7 +318,7 @@ test "alive neighbours 6 of center" {
 }
 
 test "alive neighbours 7 of center" {
-    const Game = gameLib.ConwayGame(testConfig);
+    const Game = gameLib.ConwayGame(&testConfig);
     var game = Game{};
     game.init();
 
@@ -336,7 +336,7 @@ test "alive neighbours 7 of center" {
 }
 
 test "alive neighbours 8 of center" {
-    const Game = gameLib.ConwayGame(testConfig);
+    const Game = gameLib.ConwayGame(&testConfig);
     var game = Game{};
     game.init();
 

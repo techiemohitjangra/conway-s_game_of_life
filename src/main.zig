@@ -3,7 +3,7 @@ const raylib = @import("raylib");
 const gameLib = @import("game.zig");
 
 pub fn main() !void {
-    const Game = gameLib.ConwayGame(gameLib.GameConfig{ .blockSize = 5 });
+    const Game = gameLib.ConwayGame(&gameLib.GameConfig{ .blockSize = 5 });
     var game = Game{};
     game.init();
 
@@ -58,7 +58,7 @@ pub fn main() !void {
         if (isPaused) {
             raylib.drawText("PAUSED", textStartX, textStartY, 124, raylib.Color.red);
         } else {
-            try game.updateAll();
+            game.updateAll();
         }
 
         const fps: i32 = raylib.getFPS();

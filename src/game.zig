@@ -9,7 +9,7 @@ pub const GameConfig = struct {
     fps: ?i32 = 10,
 };
 
-pub fn ConwayGame(config: GameConfig) type {
+pub fn ConwayGame(config: *const GameConfig) type {
     const gridWidth: usize = @divFloor(config.windowWidth orelse 1000, config.blockSize orelse 10);
     const gridHeight: usize = @divFloor(config.windowHeight orelse 1000, config.blockSize orelse 10);
     const size = gridHeight * gridWidth;
@@ -40,11 +40,11 @@ pub fn ConwayGame(config: GameConfig) type {
             }
         }
 
-        pub fn getCellState(self: *@This(), y: usize, x: usize) cell.CellState {
+        pub fn getCellState(self: *const @This(), y: usize, x: usize) cell.CellState {
             return self.gameState[(y * self.gridWidth) + x].cellState;
         }
 
-        pub fn drawAll(self: *@This()) void {
+        pub fn drawAll(self: *const @This()) void {
             for (0..self.gridHeight) |rowIdx| {
                 for (0..self.gridWidth) |colIdx| {
                     const index = (rowIdx * self.gridWidth) + colIdx;
@@ -55,10 +55,8 @@ pub fn ConwayGame(config: GameConfig) type {
             }
         }
 
-        // TODO: implement a function to only draw updated cells
-        // pub fn drawUpdated(self: *@This()) void {}
-
-        pub fn drawGrid(self: *@This()) void {
+        // draw grid lines
+        pub fn drawGrid(self: *const @This()) void {
             const light_gray_50 = raylib.Color{
                 .r = 200,
                 .g = 200,
@@ -73,7 +71,7 @@ pub fn ConwayGame(config: GameConfig) type {
             }
         }
 
-        pub fn aliveNeighbours(self: *@This(), y: usize, x: usize) i8 {
+        pub fn aliveNeighbours(self: *const @This(), y: usize, x: usize) i8 {
             var alive: i8 = 0;
 
             // checks cell on the left
@@ -124,30 +122,9 @@ pub fn ConwayGame(config: GameConfig) type {
             self.gameState[index].cellState = cell.CellState.Alive;
         }
 
-        // updated the cell at coordinates (x, y) based on its neighboring cells
-        // pub fn updateCell(self: *@This(), y: usize, x: usize) void {
-        //     const alive = self.aliveNeighbours(y, x);
-        //     const index = (y * self.gridWidth) + x;
-        //
-        //     if (self.gameState[index].cellState == CellState.Alive) {
-        //         // over and under population
-        //         if (alive < 2 or alive > 3) {
-        //             self.nextGen[index].cellState = CellState.OneGenDead;
-        //         }
-        //     } else {
-        //         if (alive == 3) {
-        //             self.nextGen[index].cellState = CellState.Alive;
-        //         } else if (self.gameState[index].cellState == CellState.OneGenDead) {
-        //             self.nextGen[index].cellState = CellState.TwoGenDead;
-        //         } else if (self.gameState[index].cellState == CellState.TwoGenDead) {
-        //             self.nextGen[index].cellState = CellState.LongDead;
-        //         }
-        //     }
-        // }
-
         // updated all cell in the next generation game state based on
         // their neighboring cells in the current generation
-        pub fn updateAll(self: *@This()) !void {
+        pub fn updateAll(self: *@This()) void {
             var nextGrid = self.*.gameState;
             for (0..self.gridHeight) |y| {
                 for (0..self.gridWidth) |x| {
