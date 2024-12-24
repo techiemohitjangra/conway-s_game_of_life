@@ -3,7 +3,7 @@ const raylib = @import("raylib");
 const gameLib = @import("game.zig");
 
 pub fn main() !void {
-    const Game = gameLib.ConwayGame(&gameLib.GameConfig{ .blockSize = 5 });
+    const Game = gameLib.ConwayGame(gameLib.GameConfig{ .blockSize = 5 });
     var game = Game{};
     game.init();
 
@@ -27,7 +27,7 @@ pub fn main() !void {
     while (!raylib.windowShouldClose()) {
         const mousePosition = raylib.getMousePosition();
 
-        if (raylib.isMouseButtonDown(raylib.MouseButton.mouse_button_left)) {
+        if (raylib.isMouseButtonDown(raylib.MouseButton.left)) {
             if (@as(i32, @intFromFloat(mousePosition.x)) > 0 and
                 @as(i32, @intFromFloat(mousePosition.x)) < game.windowWidth and
                 @as(i32, @intFromFloat(mousePosition.y)) > 0 and
@@ -46,7 +46,7 @@ pub fn main() !void {
         game.drawAll();
         game.drawGrid();
 
-        if (raylib.isKeyPressed(raylib.KeyboardKey.key_space)) {
+        if (raylib.isKeyPressed(raylib.KeyboardKey.space)) {
             isPaused = !isPaused;
             if (isPaused) {
                 raylib.setTargetFPS(0);

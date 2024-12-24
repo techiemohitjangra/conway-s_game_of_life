@@ -9,7 +9,7 @@ pub const GameConfig = struct {
     fps: ?i32 = 10,
 };
 
-pub fn ConwayGame(config: *const GameConfig) type {
+pub fn ConwayGame(config: GameConfig) type {
     const gridWidth: usize = @divFloor(config.windowWidth orelse 1000, config.blockSize orelse 10);
     const gridHeight: usize = @divFloor(config.windowHeight orelse 1000, config.blockSize orelse 10);
     const size = gridHeight * gridWidth;
