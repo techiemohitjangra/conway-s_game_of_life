@@ -3,10 +3,10 @@ const raylib = @import("raylib");
 const cell = @import("cell.zig");
 
 pub const GameConfig = struct {
-    windowHeight: ?usize = 1000,
-    windowWidth: ?usize = 1000,
+    windowHeight: ?u16 = 1000,
+    windowWidth: ?u16 = 1000,
     blockSize: ?usize = 10,
-    fps: ?i32 = 10,
+    fps: ?i16 = 10,
 };
 
 pub fn ConwayGame(config: GameConfig) type {

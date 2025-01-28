@@ -1,6 +1,6 @@
 const raylib = @import("raylib");
 
-pub const CellState = enum {
+pub const CellState = enum(u2) {
     Alive,
     OneGenDead,
     TwoGenDead,
