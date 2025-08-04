@@ -7,9 +7,9 @@ pub const CellState = enum(u2) {
     LongDead,
 };
 
-pub const Cell = struct {
-    x: usize,
-    y: usize,
+pub const Cell = packed struct (u32){
+    x: u15,
+    y: u15,
     cellState: CellState = CellState.LongDead,
     pub fn color(self: *const Cell) raylib.Color {
         switch (self.cellState) {

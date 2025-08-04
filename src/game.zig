@@ -5,21 +5,21 @@ const cell = @import("cell.zig");
 pub const GameConfig = struct {
     windowHeight: ?u16 = 1000,
     windowWidth: ?u16 = 1000,
-    blockSize: ?usize = 10,
+    blockSize: ?u8 = 10,
     fps: ?i16 = 10,
 };
 
 pub fn ConwayGame(config: GameConfig) type {
-    const gridWidth: usize = @divFloor(config.windowWidth orelse 1000, config.blockSize orelse 10);
-    const gridHeight: usize = @divFloor(config.windowHeight orelse 1000, config.blockSize orelse 10);
+    const gridWidth: u16 = @divFloor(config.windowWidth orelse 1000, config.blockSize orelse 10);
+    const gridHeight: u16 = @divFloor(config.windowHeight orelse 1000, config.blockSize orelse 10);
     const size = gridHeight * gridWidth;
     return struct {
-        windowHeight: usize = config.windowHeight orelse 1000,
-        windowWidth: usize = config.windowWidth orelse 1000,
-        gridHeight: usize = gridHeight,
-        gridWidth: usize = gridWidth,
-        blockSize: usize = config.blockSize orelse 10,
-        fps: i32 = config.fps orelse 10,
+        windowHeight: u16 = config.windowHeight orelse 1000,
+        windowWidth: u16 = config.windowWidth orelse 1000,
+        gridHeight: u16 = gridHeight,
+        gridWidth: u16 = gridWidth,
+        blockSize: u8 = config.blockSize orelse 10,
+        fps: i16 = config.fps orelse 10,
         gameState: [size]cell.Cell = undefined,
         nextGen: [size]cell.Cell = undefined,
 
@@ -28,19 +28,19 @@ pub fn ConwayGame(config: GameConfig) type {
         ) void {
             for (0..self.gameState.len) |index| {
                 self.gameState[index] = cell.Cell{
-                    .y = @mod(index, self.gridWidth),
-                    .x = @divFloor(index, self.gridWidth),
+                    .y = @as(u15, @intCast(@mod(index, self.gridWidth))),
+                    .x = @as(u15, @intCast(@divFloor(index, self.gridWidth))),
                     .cellState = cell.CellState.LongDead,
                 };
                 self.nextGen[index] = cell.Cell{
-                    .y = @mod(index, self.gridWidth),
-                    .x = @divFloor(index, self.gridWidth),
+                    .y = @as(u15, @intCast(@mod(index, self.gridWidth))),
+                    .x = @as(u15, @intCast(@divFloor(index, self.gridWidth))),
                     .cellState = cell.CellState.LongDead,
                 };
             }
         }
 
-        pub fn getCellState(self: *const @This(), y: usize, x: usize) cell.CellState {
+        pub fn getCellState(self: *const @This(), y: u16, x: u16) cell.CellState {
             return self.gameState[(y * self.gridWidth) + x].cellState;
         }
 
@@ -71,7 +71,7 @@ pub fn ConwayGame(config: GameConfig) type {
             }
         }
 
-        pub fn aliveNeighbours(self: *const @This(), y: usize, x: usize) i8 {
+        pub fn aliveNeighbours(self: *const @This(), y: u16, x: u16) i8 {
             var alive: i8 = 0;
 
             // checks cell on the left
@@ -111,13 +111,13 @@ pub fn ConwayGame(config: GameConfig) type {
         }
 
         // sets the cell at coordinates (x,y) to recently Dead (i.e. OneGenDead)
-        pub fn killCell(self: *@This(), y: usize, x: usize) void {
+        pub fn killCell(self: *@This(), y: u16, x: u16) void {
             const index = (y * self.gridWidth) + x;
             self.gameState[index].cellState = cell.CellState.OneGenDead;
         }
 
         // sets the cell at coordinates (x,y) to alive
-        pub fn resurrectCell(self: *@This(), y: usize, x: usize) void {
+        pub fn resurrectCell(self: *@This(), y: u16, x: u16) void {
             const index = (y * self.gridWidth) + x;
             self.gameState[index].cellState = cell.CellState.Alive;
         }
@@ -128,8 +128,8 @@ pub fn ConwayGame(config: GameConfig) type {
             var nextGrid = self.*.gameState;
             for (0..self.gridHeight) |y| {
                 for (0..self.gridWidth) |x| {
-                    const alive = self.aliveNeighbours(y, x);
-                    const index = (y * self.gridWidth) + x;
+                    const alive = self.aliveNeighbours(@as(u16, @intCast(y)), @as(u16, @intCast(x)));
+                    const index = (@as(u16, @intCast(y)) * self.gridWidth) + @as(u16,@intCast(x));
 
                     if (self.gameState[index].cellState == cell.CellState.Alive) {
                         // over and under population

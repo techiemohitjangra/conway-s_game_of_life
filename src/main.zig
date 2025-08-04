@@ -2,6 +2,8 @@ const std = @import("std");
 const raylib = @import("raylib");
 const gameLib = @import("game.zig");
 
+pub const font_path = "/home/mohitjangra/.fonts/UbuntuNerdFont-Regular.ttf";
+
 pub fn main() !void {
     const Game = gameLib.ConwayGame(gameLib.GameConfig{ .blockSize = 5 });
     var game = Game{};
@@ -16,7 +18,7 @@ pub fn main() !void {
 
     // loading font
     const text = raylib.measureTextEx(
-        raylib.Font.init("/home/mohitjangra/.fonts/UbuntuNerdFont-Regular.ttf"),
+        try raylib.Font.init(font_path),
         "PAUSED",
         128,
         0,
@@ -33,8 +35,8 @@ pub fn main() !void {
                 @as(i32, @intFromFloat(mousePosition.y)) > 0 and
                 @as(i32, @intFromFloat(mousePosition.y)) < game.windowHeight)
             {
-                const y: usize = @intCast(@divTrunc(@as(u32, @intFromFloat(mousePosition.y)), @as(u32, @intCast(game.blockSize))));
-                const x: usize = @intCast(@divTrunc(@as(u32, @intFromFloat(mousePosition.x)), @as(u32, @intCast(game.blockSize))));
+                const y: u16 = @intCast(@divTrunc(@as(u32, @intFromFloat(mousePosition.y)), @as(u32, @intCast(game.blockSize))));
+                const x: u16 = @intCast(@divTrunc(@as(u32, @intFromFloat(mousePosition.x)), @as(u32, @intCast(game.blockSize))));
                 game.resurrectCell(x, y);
             }
         }
