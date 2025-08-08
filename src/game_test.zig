@@ -16,15 +16,15 @@ test "alive neighbours top-left cell without diagonal" {
     var game = Game{};
     game.init();
 
-    game.gameState[0].cellState = cell.CellState.LongDead;
-    game.gameState[1].cellState = cell.CellState.Alive;
-    game.gameState[2].cellState = cell.CellState.LongDead;
-    game.gameState[3].cellState = cell.CellState.Alive;
-    game.gameState[4].cellState = cell.CellState.LongDead;
-    game.gameState[5].cellState = cell.CellState.LongDead;
-    game.gameState[6].cellState = cell.CellState.LongDead;
-    game.gameState[7].cellState = cell.CellState.LongDead;
-    game.gameState[8].cellState = cell.CellState.LongDead;
+    game.gameState[0] = .LongDead;
+    game.gameState[1] = .Alive;
+    game.gameState[2] = .LongDead;
+    game.gameState[3] = .Alive;
+    game.gameState[4] = .LongDead;
+    game.gameState[5] = .LongDead;
+    game.gameState[6] = .LongDead;
+    game.gameState[7] = .LongDead;
+    game.gameState[8] = .LongDead;
 
     try expect(game.aliveNeighbours(0, 0) == 2);
 }
@@ -34,15 +34,15 @@ test "alive neighbours top-left cell" {
     var game = Game{};
     game.init();
 
-    game.gameState[0].cellState = cell.CellState.LongDead;
-    game.gameState[1].cellState = cell.CellState.Alive;
-    game.gameState[2].cellState = cell.CellState.LongDead;
-    game.gameState[3].cellState = cell.CellState.Alive;
-    game.gameState[4].cellState = cell.CellState.Alive;
-    game.gameState[5].cellState = cell.CellState.LongDead;
-    game.gameState[6].cellState = cell.CellState.LongDead;
-    game.gameState[7].cellState = cell.CellState.LongDead;
-    game.gameState[8].cellState = cell.CellState.LongDead;
+    game.gameState[0] = .LongDead;
+    game.gameState[1] = .Alive;
+    game.gameState[2] = .LongDead;
+    game.gameState[3] = .Alive;
+    game.gameState[4] = .Alive;
+    game.gameState[5] = .LongDead;
+    game.gameState[6] = .LongDead;
+    game.gameState[7] = .LongDead;
+    game.gameState[8] = .LongDead;
 
     try expect(game.aliveNeighbours(0, 0) == 3);
 }
@@ -52,15 +52,15 @@ test "alive neighbours top cell" {
     var game = Game{};
     game.init();
 
-    game.gameState[0].cellState = cell.CellState.Alive;
-    game.gameState[1].cellState = cell.CellState.LongDead;
-    game.gameState[2].cellState = cell.CellState.Alive;
-    game.gameState[3].cellState = cell.CellState.Alive;
-    game.gameState[4].cellState = cell.CellState.Alive;
-    game.gameState[5].cellState = cell.CellState.Alive;
-    game.gameState[6].cellState = cell.CellState.LongDead;
-    game.gameState[7].cellState = cell.CellState.LongDead;
-    game.gameState[8].cellState = cell.CellState.LongDead;
+    game.gameState[0] = .Alive;
+    game.gameState[1] = .LongDead;
+    game.gameState[2] = .Alive;
+    game.gameState[3] = .Alive;
+    game.gameState[4] = .Alive;
+    game.gameState[5] = .Alive;
+    game.gameState[6] = .LongDead;
+    game.gameState[7] = .LongDead;
+    game.gameState[8] = .LongDead;
 
     try expect(game.aliveNeighbours(0, 1) == 5);
 }
@@ -70,15 +70,15 @@ test "alive neighbours for top-right cell" {
     var game = Game{};
     game.init();
 
-    game.gameState[0].cellState = cell.CellState.LongDead;
-    game.gameState[1].cellState = cell.CellState.Alive;
-    game.gameState[2].cellState = cell.CellState.LongDead;
-    game.gameState[3].cellState = cell.CellState.LongDead;
-    game.gameState[4].cellState = cell.CellState.Alive;
-    game.gameState[5].cellState = cell.CellState.Alive;
-    game.gameState[6].cellState = cell.CellState.LongDead;
-    game.gameState[7].cellState = cell.CellState.LongDead;
-    game.gameState[8].cellState = cell.CellState.LongDead;
+    game.gameState[0] = .LongDead;
+    game.gameState[1] = .Alive;
+    game.gameState[2] = .LongDead;
+    game.gameState[3] = .LongDead;
+    game.gameState[4] = .Alive;
+    game.gameState[5] = .Alive;
+    game.gameState[6] = .LongDead;
+    game.gameState[7] = .LongDead;
+    game.gameState[8] = .LongDead;
 
     try expect(game.aliveNeighbours(0, 2) == 3);
 }
@@ -88,15 +88,15 @@ test "alive neighbours for left cell" {
     var game = Game{};
     game.init();
 
-    game.gameState[0].cellState = cell.CellState.Alive;
-    game.gameState[1].cellState = cell.CellState.Alive;
-    game.gameState[2].cellState = cell.CellState.LongDead;
-    game.gameState[3].cellState = cell.CellState.LongDead;
-    game.gameState[4].cellState = cell.CellState.Alive;
-    game.gameState[5].cellState = cell.CellState.LongDead;
-    game.gameState[6].cellState = cell.CellState.Alive;
-    game.gameState[7].cellState = cell.CellState.Alive;
-    game.gameState[8].cellState = cell.CellState.LongDead;
+    game.gameState[0] = .Alive;
+    game.gameState[1] = .Alive;
+    game.gameState[2] = .LongDead;
+    game.gameState[3] = .LongDead;
+    game.gameState[4] = .Alive;
+    game.gameState[5] = .LongDead;
+    game.gameState[6] = .Alive;
+    game.gameState[7] = .Alive;
+    game.gameState[8] = .LongDead;
 
     try expect(game.aliveNeighbours(1, 0) == 5);
 }
@@ -106,15 +106,15 @@ test "alive neighbours center cell" {
     var game = Game{};
     game.init();
 
-    game.gameState[0].cellState = cell.CellState.Alive;
-    game.gameState[1].cellState = cell.CellState.Alive;
-    game.gameState[2].cellState = cell.CellState.Alive;
-    game.gameState[3].cellState = cell.CellState.Alive;
-    game.gameState[4].cellState = cell.CellState.LongDead;
-    game.gameState[5].cellState = cell.CellState.Alive;
-    game.gameState[6].cellState = cell.CellState.Alive;
-    game.gameState[7].cellState = cell.CellState.Alive;
-    game.gameState[8].cellState = cell.CellState.Alive;
+    game.gameState[0] = .Alive;
+    game.gameState[1] = .Alive;
+    game.gameState[2] = .Alive;
+    game.gameState[3] = .Alive;
+    game.gameState[4] = .LongDead;
+    game.gameState[5] = .Alive;
+    game.gameState[6] = .Alive;
+    game.gameState[7] = .Alive;
+    game.gameState[8] = .Alive;
 
     try expect(game.aliveNeighbours(1, 1) == 8);
 }
@@ -124,15 +124,15 @@ test "alive neighbours right cell" {
     var game = Game{};
     game.init();
 
-    game.gameState[0].cellState = cell.CellState.LongDead;
-    game.gameState[1].cellState = cell.CellState.Alive;
-    game.gameState[2].cellState = cell.CellState.Alive;
-    game.gameState[3].cellState = cell.CellState.LongDead;
-    game.gameState[4].cellState = cell.CellState.Alive;
-    game.gameState[5].cellState = cell.CellState.LongDead;
-    game.gameState[6].cellState = cell.CellState.LongDead;
-    game.gameState[7].cellState = cell.CellState.Alive;
-    game.gameState[8].cellState = cell.CellState.Alive;
+    game.gameState[0] = .LongDead;
+    game.gameState[1] = .Alive;
+    game.gameState[2] = .Alive;
+    game.gameState[3] = .LongDead;
+    game.gameState[4] = .Alive;
+    game.gameState[5] = .LongDead;
+    game.gameState[6] = .LongDead;
+    game.gameState[7] = .Alive;
+    game.gameState[8] = .Alive;
 
     try expect(game.aliveNeighbours(1, 2) == 5);
 }
@@ -142,15 +142,15 @@ test "alive neighbours bottom-left cell" {
     var game = Game{};
     game.init();
 
-    game.gameState[0].cellState = cell.CellState.LongDead;
-    game.gameState[1].cellState = cell.CellState.LongDead;
-    game.gameState[2].cellState = cell.CellState.LongDead;
-    game.gameState[3].cellState = cell.CellState.Alive;
-    game.gameState[4].cellState = cell.CellState.Alive;
-    game.gameState[5].cellState = cell.CellState.LongDead;
-    game.gameState[6].cellState = cell.CellState.LongDead;
-    game.gameState[7].cellState = cell.CellState.Alive;
-    game.gameState[8].cellState = cell.CellState.LongDead;
+    game.gameState[0] = .LongDead;
+    game.gameState[1] = .LongDead;
+    game.gameState[2] = .LongDead;
+    game.gameState[3] = .Alive;
+    game.gameState[4] = .Alive;
+    game.gameState[5] = .LongDead;
+    game.gameState[6] = .LongDead;
+    game.gameState[7] = .Alive;
+    game.gameState[8] = .LongDead;
 
     try expect(game.aliveNeighbours(2, 0) == 3);
 }
@@ -160,15 +160,15 @@ test "alive neighbours bottom cell" {
     var game = Game{};
     game.init();
 
-    game.gameState[0].cellState = cell.CellState.LongDead;
-    game.gameState[1].cellState = cell.CellState.LongDead;
-    game.gameState[2].cellState = cell.CellState.LongDead;
-    game.gameState[3].cellState = cell.CellState.Alive;
-    game.gameState[4].cellState = cell.CellState.Alive;
-    game.gameState[5].cellState = cell.CellState.Alive;
-    game.gameState[6].cellState = cell.CellState.Alive;
-    game.gameState[7].cellState = cell.CellState.LongDead;
-    game.gameState[8].cellState = cell.CellState.Alive;
+    game.gameState[0] = .LongDead;
+    game.gameState[1] = .LongDead;
+    game.gameState[2] = .LongDead;
+    game.gameState[3] = .Alive;
+    game.gameState[4] = .Alive;
+    game.gameState[5] = .Alive;
+    game.gameState[6] = .Alive;
+    game.gameState[7] = .LongDead;
+    game.gameState[8] = .Alive;
 
     try expect(game.aliveNeighbours(2, 1) == 5);
 }
@@ -178,15 +178,15 @@ test "alive neighbours for bottom-right cell" {
     var game = Game{};
     game.init();
 
-    game.gameState[0].cellState = cell.CellState.LongDead;
-    game.gameState[1].cellState = cell.CellState.LongDead;
-    game.gameState[2].cellState = cell.CellState.LongDead;
-    game.gameState[3].cellState = cell.CellState.LongDead;
-    game.gameState[4].cellState = cell.CellState.Alive;
-    game.gameState[5].cellState = cell.CellState.Alive;
-    game.gameState[6].cellState = cell.CellState.LongDead;
-    game.gameState[7].cellState = cell.CellState.Alive;
-    game.gameState[8].cellState = cell.CellState.LongDead;
+    game.gameState[0] = .LongDead;
+    game.gameState[1] = .LongDead;
+    game.gameState[2] = .LongDead;
+    game.gameState[3] = .LongDead;
+    game.gameState[4] = .Alive;
+    game.gameState[5] = .Alive;
+    game.gameState[6] = .LongDead;
+    game.gameState[7] = .Alive;
+    game.gameState[8] = .LongDead;
 
     try expect(game.aliveNeighbours(2, 2) == 3);
 }
@@ -196,15 +196,15 @@ test "alive neighbours 0 of center" {
     var game = Game{};
     game.init();
 
-    game.gameState[0].cellState = cell.CellState.LongDead;
-    game.gameState[1].cellState = cell.CellState.LongDead;
-    game.gameState[2].cellState = cell.CellState.LongDead;
-    game.gameState[3].cellState = cell.CellState.LongDead;
-    game.gameState[4].cellState = cell.CellState.LongDead;
-    game.gameState[5].cellState = cell.CellState.LongDead;
-    game.gameState[6].cellState = cell.CellState.LongDead;
-    game.gameState[7].cellState = cell.CellState.LongDead;
-    game.gameState[8].cellState = cell.CellState.LongDead;
+    game.gameState[0] = .LongDead;
+    game.gameState[1] = .LongDead;
+    game.gameState[2] = .LongDead;
+    game.gameState[3] = .LongDead;
+    game.gameState[4] = .LongDead;
+    game.gameState[5] = .LongDead;
+    game.gameState[6] = .LongDead;
+    game.gameState[7] = .LongDead;
+    game.gameState[8] = .LongDead;
 
     try expect(game.aliveNeighbours(1, 1) == 0);
 }
@@ -214,15 +214,15 @@ test "alive neighbours 1 of center" {
     var game = Game{};
     game.init();
 
-    game.gameState[0].cellState = cell.CellState.Alive;
-    game.gameState[1].cellState = cell.CellState.LongDead;
-    game.gameState[2].cellState = cell.CellState.LongDead;
-    game.gameState[3].cellState = cell.CellState.LongDead;
-    game.gameState[4].cellState = cell.CellState.LongDead;
-    game.gameState[5].cellState = cell.CellState.LongDead;
-    game.gameState[6].cellState = cell.CellState.LongDead;
-    game.gameState[7].cellState = cell.CellState.LongDead;
-    game.gameState[8].cellState = cell.CellState.LongDead;
+    game.gameState[0] = .Alive;
+    game.gameState[1] = .LongDead;
+    game.gameState[2] = .LongDead;
+    game.gameState[3] = .LongDead;
+    game.gameState[4] = .LongDead;
+    game.gameState[5] = .LongDead;
+    game.gameState[6] = .LongDead;
+    game.gameState[7] = .LongDead;
+    game.gameState[8] = .LongDead;
 
     try expect(game.aliveNeighbours(1, 1) == 1);
 }
@@ -232,15 +232,15 @@ test "alive neighbours 2 of center" {
     var game = Game{};
     game.init();
 
-    game.gameState[0].cellState = cell.CellState.Alive;
-    game.gameState[1].cellState = cell.CellState.Alive;
-    game.gameState[2].cellState = cell.CellState.LongDead;
-    game.gameState[3].cellState = cell.CellState.LongDead;
-    game.gameState[4].cellState = cell.CellState.LongDead;
-    game.gameState[5].cellState = cell.CellState.LongDead;
-    game.gameState[6].cellState = cell.CellState.LongDead;
-    game.gameState[7].cellState = cell.CellState.LongDead;
-    game.gameState[8].cellState = cell.CellState.LongDead;
+    game.gameState[0] = .Alive;
+    game.gameState[1] = .Alive;
+    game.gameState[2] = .LongDead;
+    game.gameState[3] = .LongDead;
+    game.gameState[4] = .LongDead;
+    game.gameState[5] = .LongDead;
+    game.gameState[6] = .LongDead;
+    game.gameState[7] = .LongDead;
+    game.gameState[8] = .LongDead;
 
     try expect(game.aliveNeighbours(1, 1) == 2);
 }
@@ -250,15 +250,15 @@ test "alive neighbours 3 of center" {
     var game = Game{};
     game.init();
 
-    game.gameState[0].cellState = cell.CellState.Alive;
-    game.gameState[1].cellState = cell.CellState.Alive;
-    game.gameState[2].cellState = cell.CellState.Alive;
-    game.gameState[3].cellState = cell.CellState.LongDead;
-    game.gameState[4].cellState = cell.CellState.LongDead;
-    game.gameState[5].cellState = cell.CellState.LongDead;
-    game.gameState[6].cellState = cell.CellState.LongDead;
-    game.gameState[7].cellState = cell.CellState.LongDead;
-    game.gameState[8].cellState = cell.CellState.LongDead;
+    game.gameState[0] = .Alive;
+    game.gameState[1] = .Alive;
+    game.gameState[2] = .Alive;
+    game.gameState[3] = .LongDead;
+    game.gameState[4] = .LongDead;
+    game.gameState[5] = .LongDead;
+    game.gameState[6] = .LongDead;
+    game.gameState[7] = .LongDead;
+    game.gameState[8] = .LongDead;
 
     try expect(game.aliveNeighbours(1, 1) == 3);
 }
@@ -268,15 +268,15 @@ test "alive neighbours 4 of center" {
     var game = Game{};
     game.init();
 
-    game.gameState[0].cellState = cell.CellState.Alive;
-    game.gameState[1].cellState = cell.CellState.Alive;
-    game.gameState[2].cellState = cell.CellState.Alive;
-    game.gameState[3].cellState = cell.CellState.Alive;
-    game.gameState[4].cellState = cell.CellState.LongDead;
-    game.gameState[5].cellState = cell.CellState.LongDead;
-    game.gameState[6].cellState = cell.CellState.LongDead;
-    game.gameState[7].cellState = cell.CellState.LongDead;
-    game.gameState[8].cellState = cell.CellState.LongDead;
+    game.gameState[0] = .Alive;
+    game.gameState[1] = .Alive;
+    game.gameState[2] = .Alive;
+    game.gameState[3] = .Alive;
+    game.gameState[4] = .LongDead;
+    game.gameState[5] = .LongDead;
+    game.gameState[6] = .LongDead;
+    game.gameState[7] = .LongDead;
+    game.gameState[8] = .LongDead;
 
     try expect(game.aliveNeighbours(1, 1) == 4);
 }
@@ -286,15 +286,15 @@ test "alive neighbours 5 of center" {
     var game = Game{};
     game.init();
 
-    game.gameState[0].cellState = cell.CellState.Alive;
-    game.gameState[1].cellState = cell.CellState.Alive;
-    game.gameState[2].cellState = cell.CellState.Alive;
-    game.gameState[3].cellState = cell.CellState.Alive;
-    game.gameState[4].cellState = cell.CellState.LongDead;
-    game.gameState[5].cellState = cell.CellState.Alive;
-    game.gameState[6].cellState = cell.CellState.LongDead;
-    game.gameState[7].cellState = cell.CellState.LongDead;
-    game.gameState[8].cellState = cell.CellState.LongDead;
+    game.gameState[0] = .Alive;
+    game.gameState[1] = .Alive;
+    game.gameState[2] = .Alive;
+    game.gameState[3] = .Alive;
+    game.gameState[4] = .LongDead;
+    game.gameState[5] = .Alive;
+    game.gameState[6] = .LongDead;
+    game.gameState[7] = .LongDead;
+    game.gameState[8] = .LongDead;
 
     try expect(game.aliveNeighbours(1, 1) == 5);
 }
@@ -304,15 +304,15 @@ test "alive neighbours 6 of center" {
     var game = Game{};
     game.init();
 
-    game.gameState[0].cellState = cell.CellState.Alive;
-    game.gameState[1].cellState = cell.CellState.Alive;
-    game.gameState[2].cellState = cell.CellState.Alive;
-    game.gameState[3].cellState = cell.CellState.Alive;
-    game.gameState[4].cellState = cell.CellState.LongDead;
-    game.gameState[5].cellState = cell.CellState.Alive;
-    game.gameState[6].cellState = cell.CellState.Alive;
-    game.gameState[7].cellState = cell.CellState.LongDead;
-    game.gameState[8].cellState = cell.CellState.LongDead;
+    game.gameState[0] = .Alive;
+    game.gameState[1] = .Alive;
+    game.gameState[2] = .Alive;
+    game.gameState[3] = .Alive;
+    game.gameState[4] = .LongDead;
+    game.gameState[5] = .Alive;
+    game.gameState[6] = .Alive;
+    game.gameState[7] = .LongDead;
+    game.gameState[8] = .LongDead;
 
     try expect(game.aliveNeighbours(1, 1) == 6);
 }
@@ -322,15 +322,15 @@ test "alive neighbours 7 of center" {
     var game = Game{};
     game.init();
 
-    game.gameState[0].cellState = cell.CellState.Alive;
-    game.gameState[1].cellState = cell.CellState.Alive;
-    game.gameState[2].cellState = cell.CellState.Alive;
-    game.gameState[3].cellState = cell.CellState.Alive;
-    game.gameState[4].cellState = cell.CellState.LongDead;
-    game.gameState[5].cellState = cell.CellState.Alive;
-    game.gameState[6].cellState = cell.CellState.Alive;
-    game.gameState[7].cellState = cell.CellState.Alive;
-    game.gameState[8].cellState = cell.CellState.LongDead;
+    game.gameState[0] = .Alive;
+    game.gameState[1] = .Alive;
+    game.gameState[2] = .Alive;
+    game.gameState[3] = .Alive;
+    game.gameState[4] = .LongDead;
+    game.gameState[5] = .Alive;
+    game.gameState[6] = .Alive;
+    game.gameState[7] = .Alive;
+    game.gameState[8] = .LongDead;
 
     try expect(game.aliveNeighbours(1, 1) == 7);
 }
@@ -340,15 +340,15 @@ test "alive neighbours 8 of center" {
     var game = Game{};
     game.init();
 
-    game.gameState[0].cellState = cell.CellState.Alive;
-    game.gameState[1].cellState = cell.CellState.Alive;
-    game.gameState[2].cellState = cell.CellState.Alive;
-    game.gameState[3].cellState = cell.CellState.Alive;
-    game.gameState[4].cellState = cell.CellState.LongDead;
-    game.gameState[5].cellState = cell.CellState.Alive;
-    game.gameState[6].cellState = cell.CellState.Alive;
-    game.gameState[7].cellState = cell.CellState.Alive;
-    game.gameState[8].cellState = cell.CellState.Alive;
+    game.gameState[0] = .Alive;
+    game.gameState[1] = .Alive;
+    game.gameState[2] = .Alive;
+    game.gameState[3] = .Alive;
+    game.gameState[4] = .LongDead;
+    game.gameState[5] = .Alive;
+    game.gameState[6] = .Alive;
+    game.gameState[7] = .Alive;
+    game.gameState[8] = .Alive;
 
     try expect(game.aliveNeighbours(1, 1) == 8);
 }

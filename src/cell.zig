@@ -1,22 +1,18 @@
 const raylib = @import("raylib");
 
-pub const CellState = enum(u2) {
+pub const Cell = enum(u2) {
+    const Self = @This();
     Alive,
     OneGenDead,
     TwoGenDead,
     LongDead,
-};
 
-pub const Cell = packed struct (u32){
-    x: u15,
-    y: u15,
-    cellState: CellState = CellState.LongDead,
-    pub fn color(self: *const Cell) raylib.Color {
-        switch (self.cellState) {
-            CellState.Alive => {
+    pub fn color(self: Self) raylib.Color {
+        switch (self) {
+            .Alive => {
                 return raylib.Color.black;
             },
-            CellState.OneGenDead => {
+            .OneGenDead => {
                 const powder_blue = raylib.Color{
                     .r = 192,
                     .g = 220,
@@ -25,7 +21,7 @@ pub const Cell = packed struct (u32){
                 };
                 return powder_blue;
             },
-            CellState.TwoGenDead => {
+            .TwoGenDead => {
                 const light_blue_gray = raylib.Color{
                     .r = 202,
                     .g = 204,
@@ -34,7 +30,7 @@ pub const Cell = packed struct (u32){
                 };
                 return light_blue_gray;
             },
-            CellState.LongDead => {
+            .LongDead => {
                 return raylib.Color.white;
             },
         }
