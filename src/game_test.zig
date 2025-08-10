@@ -2,7 +2,6 @@ const std = @import("std");
 const expect = std.testing.expect;
 const gameLib = @import("game.zig");
 const cell = @import("cell.zig");
-var test_allocator = std.testing.allocator;
 
 const testConfig = gameLib.GameConfig{
     .windowHeight = 300,
