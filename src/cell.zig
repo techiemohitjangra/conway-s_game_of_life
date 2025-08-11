@@ -2,10 +2,10 @@ const raylib = @import("raylib");
 
 pub const Cell = enum(u2) {
     const Self = @This();
+    LongDead=0,
     Alive,
     OneGenDead,
     TwoGenDead,
-    LongDead,
 
     pub fn color(self: Self) raylib.Color {
         switch (self) {

@@ -22,13 +22,9 @@ pub fn ConwayGame(config: GameConfig) type {
         blockSize: u8 = config.blockSize orelse 10,
         fps: i16 = config.fps orelse 10,
         gameState: [size]cell.Cell = undefined,
-        nextGen: [size]cell.Cell = undefined,
 
         pub fn init(self: *Self) void {
-            for (0..self.gameState.len) |index| {
-                self.gameState[index] = .LongDead;
-                self.nextGen[index] = .LongDead;
-            }
+            _ = self;
         }
 
         pub fn getCell(self: *const Self, y: u16, x: u16) cell.Cell {
@@ -44,6 +40,25 @@ pub fn ConwayGame(config: GameConfig) type {
                     raylib.drawRectangle(positionX, positionY, @as(i32, @intCast(self.blockSize)), @as(i32, @intCast(self.blockSize)), self.gameState[index].color());
                 }
             }
+        }
+
+        pub fn drawActiveCells(self: *const Self) void {
+            for (0..self.gridHeight) |rowIdx| {
+                for (0..self.gridWidth) |colIdx| {
+                    const index = (rowIdx * self.gridWidth) + colIdx;
+                    if (self.gameState[index] == .LongDead) continue;
+                    const positionX: i32 = @intCast(rowIdx * self.blockSize);
+                    const positionY: i32 = @intCast(colIdx * self.blockSize);
+                    raylib.drawRectangle(positionX, positionY, @as(i32, @intCast(self.blockSize)), @as(i32, @intCast(self.blockSize)), self.gameState[index].color());
+                }
+            }
+        }
+
+        pub fn drawCell(self: *const Self, y: u16, x: u16) void {
+            const index = (x * self.gridWidth) + y;
+            const positionX: i32 = @intCast(x * self.blockSize);
+            const positionY: i32 = @intCast(y * self.blockSize);
+            raylib.drawRectangle(positionX, positionY, @as(i32, @intCast(self.blockSize)), @as(i32, @intCast(self.blockSize)), self.gameState[index].color());
         }
 
         // draw grid lines
@@ -62,54 +77,32 @@ pub fn ConwayGame(config: GameConfig) type {
             }
         }
 
-        pub fn aliveNeighbours(self: *const Self, y: u16, x: u16) i8 {
-            var alive: i8 = 0;
+        pub fn aliveNeighbours(self: *const Self, y: u16, x: u16) i3 {
+            var alive: i3 = 0;
 
             // checks cell on the left
-            if (x > 0 and self.getCell(y, x - 1) == .Alive) {
-                alive += 1;
-            }
+            alive += @intFromBool(x > 0 and self.getCell(y, x - 1) == .Alive);
             // checks cell on the right
-            if (x < self.gridWidth - 1 and self.getCell(y, x + 1) == .Alive) {
-                alive += 1;
-            }
+            alive += @intFromBool(x < self.gridWidth - 1 and self.getCell(y, x + 1) == .Alive);
             // checks cell on the top
-            if (y > 0 and self.getCell(y - 1, x) == .Alive) {
-                alive += 1;
-            }
+            alive += @intFromBool(y > 0 and self.getCell(y - 1, x) == .Alive);
             // checks cell on the bottom
-            if (y < self.gridHeight - 1 and self.getCell(y + 1, x) == .Alive) {
-                alive += 1;
-            }
+            alive += @intFromBool(y < self.gridHeight - 1 and self.getCell(y + 1, x) == .Alive);
             // checks cell on the top-left
-            if (y > 0 and x > 0 and self.getCell(y - 1, x - 1) == .Alive) {
-                alive += 1;
-            }
+            alive += @intFromBool(y > 0 and x > 0 and self.getCell(y - 1, x - 1) == .Alive);
             // checks cell on the top-right
-            if (y > 0 and x < self.gridWidth - 1 and self.getCell(y - 1, x + 1) == .Alive) {
-                alive += 1;
-            }
+            alive += @intFromBool(y > 0 and x < self.gridWidth - 1 and self.getCell(y - 1, x + 1) == .Alive);
             // checks cell on the bottom-left
-            if (y < self.gridHeight - 1 and x > 0 and self.getCell(y + 1, x - 1) == .Alive) {
-                alive += 1;
-            }
+            alive += @intFromBool(y < self.gridHeight - 1 and x > 0 and self.getCell(y + 1, x - 1) == .Alive);
             // checks cell on the bottom-right
-            if (y < self.gridHeight - 1 and x < self.gridWidth - 1 and self.getCell(y + 1, x + 1) == .Alive) {
-                alive += 1;
-            }
+            alive += @intFromBool(y < self.gridHeight - 1 and x < self.gridWidth - 1 and self.getCell(y + 1, x + 1) == .Alive);
 
             return alive;
         }
 
-        // sets the cell at coordinates (x,y) to recently Dead (i.e. OneGenDead)
-        pub fn killCell(self: *Self, y: u16, x: u16) void {
-            const index = (y * self.gridWidth) + x;
-            self.gameState[index] = .OneGenDead;
-        }
-
         // sets the cell at coordinates (x,y) to alive
         pub fn resurrectCell(self: *Self, y: u16, x: u16) void {
-            const index = (y * self.gridWidth) + x;
+            const index = (x * self.gridWidth) + y;
             self.gameState[index] = .Alive;
         }
 

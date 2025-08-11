@@ -23,42 +23,50 @@ pub fn main() !void {
         128,
         0,
     );
-    const textStartX: i32 = @intFromFloat(text.x / 2);
-    const textStartY: i32 = @intFromFloat(text.y / 2);
+
+    const textStartX: i16 = @intFromFloat(text.x / 2);
+    const textStartY: i16 = @intFromFloat(text.y / 2);
+
+    game.drawAll();
+    game.drawGrid();
 
     while (!raylib.windowShouldClose()) {
         const mousePosition = raylib.getMousePosition();
 
         if (raylib.isMouseButtonDown(raylib.MouseButton.left)) {
-            if (@as(i32, @intFromFloat(mousePosition.x)) > 0 and
-                @as(i32, @intFromFloat(mousePosition.x)) < game.windowWidth and
-                @as(i32, @intFromFloat(mousePosition.y)) > 0 and
-                @as(i32, @intFromFloat(mousePosition.y)) < game.windowHeight)
+            if (@as(i16, @intFromFloat(mousePosition.x)) > 0 and
+                @as(i16, @intFromFloat(mousePosition.x)) < game.windowWidth and
+                @as(i16, @intFromFloat(mousePosition.y)) > 0 and
+                @as(i16, @intFromFloat(mousePosition.y)) < game.windowHeight)
             {
                 const y: u16 = @intCast(@divTrunc(@as(u32, @intFromFloat(mousePosition.y)), @as(u32, @intCast(game.blockSize))));
                 const x: u16 = @intCast(@divTrunc(@as(u32, @intFromFloat(mousePosition.x)), @as(u32, @intCast(game.blockSize))));
-                game.resurrectCell(x, y);
+                game.resurrectCell(y, x);
             }
         }
 
         raylib.beginDrawing();
         defer raylib.endDrawing();
 
-        raylib.clearBackground(raylib.Color.gray);
-        game.drawAll();
+        if (!isPaused) {
+            raylib.clearBackground(raylib.Color.gray);
+            game.drawAll();
+        } else {
+            raylib.clearBackground(raylib.Color.white);
+            game.drawActiveCells();
+        }
         game.drawGrid();
 
         if (raylib.isKeyPressed(raylib.KeyboardKey.space)) {
             isPaused = !isPaused;
-            if (isPaused) {
-                raylib.setTargetFPS(0);
-            } else {
-                raylib.setTargetFPS(game.fps);
-            }
+            const fps = @intFromBool(!isPaused) * game.fps;
+            raylib.setTargetFPS(fps);
         }
 
+        // if paused draw text "PAUSED"
         if (isPaused) {
             raylib.drawText("PAUSED", textStartX, textStartY, 124, raylib.Color.red);
+            // if not paused progress game
         } else {
             game.updateAll();
         }
