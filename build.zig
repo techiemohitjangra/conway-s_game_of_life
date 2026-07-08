@@ -5,11 +5,11 @@ const main = @import("src/main.zig");
 // declaratively construct a build graph that will be executed by an external
 // runner.
 pub fn build(b: *std.Build) void {
-    const font_file = std.fs.cwd().openFile(main.font_path, .{}) catch |err| {
+    const io = b.graph.io;
+    std.Io.Dir.cwd().access(io, main.font_path, .{}) catch |err| {
         std.debug.print("Font file missing: {}\n", .{err});
         @panic("Missing required font file. Please run the setup script.");
     };
-    _ = font_file;
 
     // Standard target options allows the person running `zig build` to choose
     // what target to build for. Here we do not override the defaults, which
@@ -21,7 +21,7 @@ pub fn build(b: *std.Build) void {
     // between Debug, ReleaseSafe, ReleaseFast, and ReleaseSmall. Here we do not
     // set a preferred release mode, allowing the user to decide how to optimize.
     const optimize = b.standardOptimizeOption(.{
-        // .preferred_optimize_mode = .ReleaseFast,
+        .preferred_optimize_mode = .ReleaseFast,
     });
 
     // We will also create a module for our other entry point, 'main.zig'.
@@ -38,6 +38,7 @@ pub fn build(b: *std.Build) void {
     const raylib_dep = b.dependency("raylib_zig", .{
         .target = target,
         .optimize = optimize,
+        .linkage = .dynamic,
     });
 
     const raylib = raylib_dep.module("raylib"); // main raylib module
@@ -49,13 +50,13 @@ pub fn build(b: *std.Build) void {
     const exe = b.addExecutable(.{
         .name = "conway_s_game_of_life",
         .root_module = exe_mod,
+        .use_lld = true,
+        .use_llvm = true,
     });
 
-
-    exe.linkLibrary(raylib_artifact);
+    exe.root_module.linkLibrary(raylib_artifact);
     exe.root_module.addImport("raylib", raylib);
     exe.root_module.addImport("raygui", raygui);
-
 
     // This declares intent for the executable to be installed into the
     // standard location when the user invokes the "install" step (the default

@@ -77,8 +77,8 @@ pub fn ConwayGame(config: GameConfig) type {
             }
         }
 
-        pub fn aliveNeighbours(self: *const Self, y: u16, x: u16) i3 {
-            var alive: i3 = 0;
+        pub fn aliveNeighbours(self: *const Self, y: u16, x: u16) i8 {
+            var alive: i8 = 0;
 
             // checks cell on the left
             alive += @intFromBool(x > 0 and self.getCell(y, x - 1) == .Alive);

@@ -59,8 +59,8 @@ pub fn main() !void {
 
         if (raylib.isKeyPressed(raylib.KeyboardKey.space)) {
             isPaused = !isPaused;
-            const fps = @intFromBool(!isPaused) * game.fps;
-            raylib.setTargetFPS(fps);
+        } else {
+            isPaused = raylib.isMouseButtonDown(raylib.MouseButton.left);
         }
 
         // if paused draw text "PAUSED"
@@ -70,6 +70,7 @@ pub fn main() !void {
         } else {
             game.updateAll();
         }
+        raylib.setTargetFPS(@intFromBool(!isPaused) * game.fps);
 
         const fps: i32 = raylib.getFPS();
         raylib.drawText(raylib.textFormat("%i", .{fps}), 0, 0, 36, raylib.Color.black);
